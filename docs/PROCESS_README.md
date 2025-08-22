@@ -1,4 +1,4 @@
-# Proceso de Ingesta y Conteo de Pasajeros — Documento Técnico
+# Proceso de ingesta y conteo de pasajeros — Documento técnico
 
 Este documento describe **a detalle** el flujo de negocio y técnico del servicio de *Passenger Event Processing* sin centrarse en el código, sino en **qué hace** y **por qué**. Aplica igual para eventos recibidos por **REST** o por **Kafka** (únicamente consumidor).
 
