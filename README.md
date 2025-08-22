@@ -92,15 +92,9 @@ Códigos de estado:
 
 ---
 
-## Flujo de Procesamiento
+## Flujo de procesamiento
 
-1. El servicio:
-   - Mapea el request a dominio (`PassengerEvent`).
-   - Bloquea la fila del vehículo (`SELECT ... FOR UPDATE`).
-   - Inserta el evento.
-   - Actualiza estado de vehículo y viaje actual.
-   - Libera lock al terminar la transacción.
-2. Devuelve respuesta con estado.
+1. Puede consultar la documentación detallada del proceso en: [docs](./docs/PROCESS_README.md).
 
 > ⚠️ Los eventos del **mismo vehículo** se procesan **secuencialmente** (1.7 evento/segundo aprox). Esto garantiza consistencia en los conteos.
 
