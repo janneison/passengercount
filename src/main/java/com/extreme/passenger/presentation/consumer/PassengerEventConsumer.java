@@ -21,7 +21,7 @@ public class PassengerEventConsumer {
     private final PassengerEventMapper mapper;
     private final ProcessPassengerEventService service;
 
-    @KafkaListener(topics = "${app.kafka.passenger-topic}", concurrency = "${KAFKA_CONCURRENCY:1}")
+    @KafkaListener(topics = "${app.kafka.passenger-topic}", concurrency = "${KAFKA_CONCURRENCY:1}", autoStartup = "${app.kafka.consumer-enabled}")
     public void onMessage(String payload, Acknowledgment ack) {
         if (payload == null || payload.isBlank()) {
             log.debug("Kafka: payload vacío → ack & skip");

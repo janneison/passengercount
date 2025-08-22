@@ -35,3 +35,4 @@ server:
 app:
   kafka:
     passenger-topic: ${PASSENGER_TOPIC:}
+    consumer-enabled: ${KAFKA_CONSUMER_ENABLED:}
