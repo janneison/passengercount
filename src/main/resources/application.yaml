@@ -1,0 +1,37 @@
+spring: 
+  config: 
+    import: optional:file:.env[.properties] 
+  datasource: 
+    url: ${DB_URL:} 
+    username: ${DB_USER:} 
+    password: ${DB_PASSWORD:} 
+  jpa: 
+    hibernate: 
+      ddl-auto: ${HIBERNATE_DDL_AUTO:none} 
+      properties: 
+        hibernate: 
+          format_sql: ${HIBERNATE_FORMAT_SQL:true} 
+  jackson: 
+    time-zone: ${TIMEZONE:UTC}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:}
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+    properties:
+      spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+      spring.deserializer.value.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual_immediate
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/api/v1}
+
+app:
+  kafka:
+    passenger-topic: ${PASSENGER_TOPIC:}
