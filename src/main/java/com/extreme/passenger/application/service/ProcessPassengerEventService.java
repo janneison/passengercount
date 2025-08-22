@@ -53,17 +53,18 @@ public class ProcessPassengerEventService {
         try {
             log.info("{} Evento recibido: {}", logPrefix, event);
 
-            repository.lockVehicleRow(event.getIdVehicle());
-
+            
             // 0) Verificar vehículo
             if (!repository.vehicleExists(event.getIdVehicle())) {
                 log.warn("{} Vehículo no encontrado", logPrefix);
                 return PassengerEventOut.builder()
-                        .status(Status.NOT_FOUND)
-                        .message("Vehículo no encontrado")
-                        .data(event)
-                        .build();
+                .status(Status.NOT_FOUND)
+                .message("Vehículo no encontrado")
+                .data(event)
+                .build();
             }
+            
+            repository.lockVehicleRow(event.getIdVehicle());
 
             // 1) Acumulados totales de esta lectura (raw)
             Accumulators raw = Accumulators.builder()
