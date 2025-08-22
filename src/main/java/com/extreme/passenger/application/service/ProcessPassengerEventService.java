@@ -35,7 +35,6 @@ public class ProcessPassengerEventService {
 
     private Instant now() { return Instant.now(); }
 
-    /** Procesa en **UNA** transacción (atomicidad). */
     @Transactional
     public PassengerEventOut processSync(PassengerEvent event) {
 
