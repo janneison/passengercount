@@ -32,7 +32,7 @@ public class PassengerEventConsumer {
         try {
             PassengerEventIn in = json.readValue(payload, PassengerEventIn.class);
             log.debug("Kafka: recibido evento {}", in);
-            service.process(mapper.toDomain(in));
+            service.processSync(mapper.toDomain(in));
         } catch (Exception e) {
             log.error("Kafka: error, se ackea igual (at-most-once)", e);
         } finally {

@@ -103,7 +103,14 @@ public class PassengerEventJdbcRepository implements PassengerEventRepository {
     private static final String SQL_UPDATE_LAST_COUNT =
             "UPDATE vehiculos SET fecha_ultimo_conteo = ? WHERE idvehiculo = ?";
 
-    // ---- Impl ----
+    private static final String SQL_LOCK_VEHICLE =
+        "SELECT idvehiculo FROM vehiculos WHERE idvehiculo = ? FOR UPDATE";
+
+    @Override public void lockVehicleRow(String idVehicle) {
+        // Toma un lock exclusivo sobre la fila del vehículo hasta el commit/rollback
+        jdbc.queryForObject(SQL_LOCK_VEHICLE, String.class, idVehicle);
+    }
+
     @Override public boolean vehicleExists(String idVehicle) {
         Boolean exists = jdbc.queryForObject(SQL_VEHICLE_EXISTS, Boolean.class, idVehicle);
         return Boolean.TRUE.equals(exists);

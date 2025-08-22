@@ -25,6 +25,8 @@ public interface PassengerEventRepository {
 
     void updateVehicleLastCount(String idVehicle, Instant when);
 
+    public void lockVehicleRow(String idVehicle);
+
     // Tipos auxiliares
     record RepoAcc(Long programId, Accumulators acc) {}
     record PrevPoint(Long pointId, Integer order, boolean blank) {}

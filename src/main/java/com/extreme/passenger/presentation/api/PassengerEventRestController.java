@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.extreme.passenger.application.service.ProcessPassengerEventService;
@@ -16,7 +17,8 @@ import com.extreme.passenger.presentation.mapper.PassengerEventMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController("passenger-events")
+@RestController
+@RequestMapping("/passenger-events")
 public class PassengerEventRestController {
 
     private final PassengerEventMapper mapper;
@@ -26,7 +28,7 @@ public class PassengerEventRestController {
     public ResponseEntity<PassengerEventOut> handleSyncIngest(@RequestBody PassengerEventIn in) {
         try {
             PassengerEvent event = mapper.toDomain(in);
-            PassengerEventOut passengerEventOut = service.process(event).join();
+            PassengerEventOut passengerEventOut = service.processSync(event);
             return ResponseEntity.status(passengerEventOut.getStatus().getHttpStatus()).body(passengerEventOut);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,7 +45,7 @@ public class PassengerEventRestController {
     public ResponseEntity<PassengerEventOut> handleAsyncIngest(@RequestBody PassengerEventIn in) {
         try {
             PassengerEvent event = mapper.toDomain(in);
-            service.process(event);
+            service.processAsync(event);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(PassengerEventOut.builder()
                 .data(event)
                 .status(Status.RECEIVED)

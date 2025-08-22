@@ -46,10 +46,13 @@ public class ProcessPassengerEventService {
                     .build();
         }
 
-        String logPrefix = "[vehicle=" + event.getIdVehicle() + "]";
+        String messageId = String.valueOf(System.nanoTime());
+        String logPrefix = "[vehicle=" + event.getIdVehicle() + "][eventId=" + messageId + "]";
 
         try {
-            log.info("{} {}", logPrefix, event);
+            log.info("{} Evento recibido: {}", logPrefix, event);
+
+            repository.lockVehicleRow(event.getIdVehicle());
 
             // 0) Verificar vehículo
             if (!repository.vehicleExists(event.getIdVehicle())) {
@@ -60,6 +63,8 @@ public class ProcessPassengerEventService {
                         .data(event)
                         .build();
             }
+
+            log.info("{} Vehículo encontrado", logPrefix); // DELETE THIS
 
             // 1) Acumulados totales de esta lectura (raw)
             Accumulators raw = Accumulators.builder()
@@ -136,6 +141,7 @@ public class ProcessPassengerEventService {
 
             if (lastDateOpt.isPresent() && spike && inWindow && !excluded) {
                 repository.insertDiscarded(event, net, raw, null, null);
+                log.warn("{} Evento descartado por pico (net={} minDiff={} tol={} minLimit={})", logPrefix, net, minutesDiff, tol, minLimit);
                 return PassengerEventOut.builder()
                         .status(Status.DISCARDED)
                         .message("Evento descartado por pico")
@@ -145,6 +151,7 @@ public class ProcessPassengerEventService {
 
             // 7) viaje actual
             Long programId = repository.getActiveProgramToday(event.getIdVehicle()).orElse(null);
+            log.info("{} Viaje actual: {}", logPrefix, programId);
 
             // 8) punto anterior
             Long pointId = null;
@@ -154,6 +161,7 @@ public class ProcessPassengerEventService {
                     programId = prevProgramId;
                     pointId = pp.get().pointId();
                     repository.updateProgvehiculosCounters(programId, net.getTotalIn(), net.getTotalOut(), net.getTotalBlock());
+                    log.info("{} Punto anterior encontrado: programId={} pointId={}", logPrefix, programId, pointId);
                 }
             }
 
@@ -165,7 +173,9 @@ public class ProcessPassengerEventService {
 
             // 10) insert final + update vehiculos
             repository.insertPassengerEvent(event, programId, pointId, net, raw);
+            log.info("{} Evento insertado {}", logPrefix, event);
             repository.updateVehicleLastCount(event.getIdVehicle(), currentDate);
+            log.info("{} Vehículo actualizado", logPrefix);
 
             return PassengerEventOut.builder()
                     .status(Status.OK)
@@ -192,7 +202,7 @@ public class ProcessPassengerEventService {
     }
 
     @Async
-    public CompletableFuture<PassengerEventOut> process(PassengerEvent event) {
+    public CompletableFuture<PassengerEventOut> processAsync(PassengerEvent event) {
         return CompletableFuture.completedFuture(processSync(event));
     }
 }
