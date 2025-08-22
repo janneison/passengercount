@@ -204,7 +204,6 @@ public class ProcessPassengerEventService {
         }
     }
 
-    // ---- helpers ----
     private static int nz(Integer v) { return v == null ? 0 : v; }
 
     private static boolean anyGte(Accumulators n, int tol) {

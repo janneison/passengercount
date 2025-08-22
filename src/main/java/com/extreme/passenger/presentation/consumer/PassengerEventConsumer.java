@@ -57,14 +57,7 @@ public class PassengerEventConsumer {
             return;
         }
 
-        // 3) Validación mínima (si es inválido, no tiene sentido reintentar) → ack & skip
-        if (in == null || in.getIdVehicle() == null || in.getCheckinTime() == null) {
-            log.warn("Kafka {}: evento inválido (falta idVehicle o checkinTime) → ack & skip. in={}", meta, in);
-            ack.acknowledge();
-            return;
-        }
-
-        // 4) Proceso de negocio: si falla (BD down, etc) NO ack → retry por el contenedor
+        // 3) Proceso de negocio: si falla (BD down, etc) NO ack → retry por el contenedor
         try {
             PassengerEventOut out = service.processSync(mapper.toDomain(in));
             if (NON_RETRYABLE.contains(out.getStatus())) {
