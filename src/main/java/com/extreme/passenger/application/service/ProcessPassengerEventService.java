@@ -65,8 +65,6 @@ public class ProcessPassengerEventService {
                         .build();
             }
 
-            log.info("{} Vehículo encontrado", logPrefix); // DELETE THIS
-
             // 1) Acumulados totales de esta lectura (raw)
             Accumulators raw = Accumulators.builder()
                     .door1In(nz(event.getDoor1In()))

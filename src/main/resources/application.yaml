@@ -1,22 +1,26 @@
 spring: 
   config: 
     import: optional:file:.env[.properties] 
+
   datasource: 
     url: ${DB_URL:} 
     username: ${DB_USER:} 
     password: ${DB_PASSWORD:} 
+
   jpa: 
     hibernate: 
       ddl-auto: ${HIBERNATE_DDL_AUTO:none} 
       properties: 
         hibernate: 
           format_sql: ${HIBERNATE_FORMAT_SQL:true} 
+
   jackson: 
-    time-zone: ${TIMEZONE:UTC}
+    time-zone: ${APP_TIMEZONE:America/Bogota}
+
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:}
     consumer:
-      group-id: ${KAFKA_CONSUMER_GROUP_ID:}
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:passenger-events-group}
       enable-auto-commit: false
       auto-offset-reset: earliest
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
@@ -35,8 +39,8 @@ server:
 app:
 
   kafka:
-    passenger-topic: ${PASSENGER_TOPIC:}
-    consumer-enabled: ${KAFKA_CONSUMER_ENABLED:}
+    passenger-topic: ${PASSENGER_TOPIC:sniffer-t3-passengers}
+    consumer-enabled: ${KAFKA_CONSUMER_ENABLED:false}
   
   excluded-ids: ${APP_EXCLUDED_IDS:COOCHOFAL250,EMBUSA99}
   passenger-count-tolerance: ${APP_PASSENGER_COUNT_TOLERANCE:200}

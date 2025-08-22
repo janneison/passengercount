@@ -9,10 +9,11 @@ Permite recibir en tiempo real información de conteo (entradas/salidas por puer
 1. [Arquitectura](#arquitectura)
 2. [Tecnologías](#tecnologías)
 3. [Endpoints](#endpoints)
-4. [Flujo de Procesamiento](#flujo-de-procesamiento)
-5. [Instalación y Despliegue](#instalación-y-despliegue)
-6. [Pruebas con JMeter](#pruebas-con-jmeter)
-7. [Logs y Debugging](#logs-y-debugging)
+4. [Flujo de procesamiento](#flujo-de-procesamiento)
+5. [Instalación y despliegue](#instalación-y-despliegue)
+6. [Variables de entorno](#variables-de-entorno)
+7. [Pruebas con JMeter](#pruebas-con-jmeter)
+8. [Logs y debugging](#logs-y-debugging)
 
 ---
 
@@ -108,41 +109,108 @@ Códigos de estado:
    cd passenger-events
    ```
 
-1. Configurar variables de entorno en `.env`:
-   ```env
-    DB_URL=
-    DB_USER=
-    DB_PASSWORD=
-    HIBERNATE_DDL_AUTO=none
-    HIBERNATE_FORMAT_SQL=true
-    TIMEZONE=UTC
-    KAFKA_BOOTSTRAP_SERVERS=
-    KAFKA_CONSUMER_GROUP_ID=passenger-events-group
-    KAFKA_AUTO_OFFSET_RESET=earliest
-    KAFKA_CONSUMER_ENABLED=false
-    SERVER_PORT=8080
-    SERVER_CONTEXT_PATH=/api/v1
-    PASSENGER_TOPIC=
-    APP_EXCLUDED_IDS=COOCHOFAL250
-    APP_PASSENGER_COUNT_TOLERANCE=200
-    APP_TIME_THRESHOLD_MINUTES=45
-    APP_TIMEZONE=America/Bogota
-    APP_ASYNC_CORE_POOL_SIZE=2
-    APP_ASYNC_MAX_POOL_SIZE=2
-    APP_ASYNC_QUEUE_CAPACITY=500
-   ```
+2. Configurar variables de entorno en `.env`:
 
-2. Levantar con Docker Compose:
+3. Levantar con Docker Compose:
    ```bash
    docker compose up -d
    ```
 
-3. Acceso API:
+4. Acceso API:
    ```
    http://localhost:8080/api/v1/passenger-events/sync/process-event
    ```
 
 ---
+
+## Variables de entorno
+
+Estas variables controlan la configuración de la aplicación en tiempo de ejecución. 
+Deben definirse en un archivo `.env` o inyectarse en el entorno donde se ejecute el servicio (ej. contenedor Docker, ECS, Kubernetes).
+
+```env
+# =======================
+# BASE DE DATOS
+# =======================
+DB_URL=                     # URL de conexión JDBC a la base de datos (ej: jdbc:postgresql://host:5432/dbname)
+DB_USER=                    # Usuario de conexión a la base de datos
+DB_PASSWORD=                # Contraseña del usuario de base de datos
+HIBERNATE_DDL_AUTO=none     # Estrategia de inicialización de Hibernate (none, validate, update, create, create-drop)
+HIBERNATE_FORMAT_SQL=true   # Formatear las sentencias SQL en logs para mayor legibilidad
+
+# =======================
+# ZONA HORARIA
+# =======================
+TIMEZONE=UTC                # Zona horaria global de la app (ej: UTC, America/Bogota)
+
+# =======================
+# KAFKA
+# =======================
+KAFKA_BOOTSTRAP_SERVERS=     # Lista de brokers Kafka (ej: host1:9092,host2:9092)
+KAFKA_CONSUMER_GROUP_ID=passenger-events-group   # ID del consumer group para consumir eventos
+KAFKA_AUTO_OFFSET_RESET=earliest                 # Estrategia de lectura si no hay offset (earliest/latest/none)
+KAFKA_CONSUMER_ENABLED=false                     # Habilitar o deshabilitar el consumo de Kafka (true/false)
+PASSENGER_TOPIC=             # Nombre del tópico de Kafka de eventos de pasajeros
+
+# =======================
+# SERVIDOR
+# =======================
+SERVER_PORT=8080            # Puerto HTTP en el que expone el servicio
+SERVER_CONTEXT_PATH=/api/v1 # Context path de la API REST
+
+# =======================
+# APLICACIÓN (APP)
+# =======================
+APP_EXCLUDED_IDS=COOCHOFAL250     # Lista de vehículos a excluir, separada por comas
+APP_PASSENGER_COUNT_TOLERANCE=200 # Tolerancia en el conteo de pasajeros (ej: máximo permitido de diferencia)
+APP_TIME_THRESHOLD_MINUTES=45     # Umbral de tiempo en minutos para validar eventos
+APP_TIMEZONE=America/Bogota       # Zona horaria usada para procesar fechas de negocio
+
+# =======================
+# ASYNC (EJECUCIÓN CONCURRENTE)
+# =======================
+APP_ASYNC_CORE_POOL_SIZE=2   # Número mínimo de hilos en el pool
+APP_ASYNC_MAX_POOL_SIZE=2    # Número máximo de hilos en el pool
+APP_ASYNC_QUEUE_CAPACITY=500 # Capacidad máxima de la cola de tareas pendientes
+```
+
+---
+
+## Ejemplo de archivo `.env` para entorno local
+
+```env
+   # Base de datos
+   DB_URL=jdbc:postgresql://localhost:5432/passengers
+   DB_USER=postgres
+   DB_PASSWORD=postgres
+   HIBERNATE_DDL_AUTO=update
+   HIBERNATE_FORMAT_SQL=true
+
+   # Zona horaria
+   TIMEZONE=America/Bogota
+
+   # Kafka
+   KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+   KAFKA_CONSUMER_GROUP_ID=passenger-events-group
+   KAFKA_AUTO_OFFSET_RESET=earliest
+   KAFKA_CONSUMER_ENABLED=true
+   PASSENGER_TOPIC=passenger-events
+
+   # Servidor
+   SERVER_PORT=8080
+   SERVER_CONTEXT_PATH=/api/v1
+
+   # Aplicación
+   APP_EXCLUDED_IDS=COOCHOFAL250,EMBUSA99
+   APP_PASSENGER_COUNT_TOLERANCE=200
+   APP_TIME_THRESHOLD_MINUTES=45
+   APP_TIMEZONE=America/Bogota
+
+   # Async
+   APP_ASYNC_CORE_POOL_SIZE=2
+   APP_ASYNC_MAX_POOL_SIZE=2
+   APP_ASYNC_QUEUE_CAPACITY=500
+```
 
 ## Pruebas con JMeter
 
