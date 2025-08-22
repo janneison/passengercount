@@ -1,7 +1,7 @@
-# Passenger Events Service
+# Passenger Count Service
 
 Servicio backend para la **gestión y procesamiento de eventos de pasajeros en vehículos**.  
-Permite recibir en tiempo real información de conteo (entradas/salidas por puerta, bloqueos, ubicación, timestamp) y mantener la consistencia de los datos por vehículo y viaje activo.
+Permite recibir en tiempo real información de conteo (entradas/salidas por puerta, bloqueos, ubicación, timestamp) y mantener la consistencia de los datos por vehículo y viaje.
 
 ---
 
@@ -100,7 +100,7 @@ Códigos de estado:
 
 ---
 
-## Instalación y Despliegue
+## Instalación y despliegue
 
 1. Clonar repositorio:
    ```bash
@@ -120,9 +120,16 @@ Códigos de estado:
     KAFKA_CONSUMER_GROUP_ID=passenger-events-group
     KAFKA_AUTO_OFFSET_RESET=earliest
     KAFKA_CONSUMER_ENABLED=false
-    SERVER_PORT=
+    SERVER_PORT=8080
     SERVER_CONTEXT_PATH=/api/v1
     PASSENGER_TOPIC=
+    APP_EXCLUDED_IDS=COOCHOFAL250
+    APP_PASSENGER_COUNT_TOLERANCE=200
+    APP_TIME_THRESHOLD_MINUTES=45
+    APP_TIMEZONE=America/Bogota
+    APP_ASYNC_CORE_POOL_SIZE=2
+    APP_ASYNC_MAX_POOL_SIZE=2
+    APP_ASYNC_QUEUE_CAPACITY=500
    ```
 
 2. Levantar con Docker Compose:
@@ -153,7 +160,7 @@ Códigos de estado:
 
 ---
 
-## Logs y Debugging
+## Logs y debugging
 
 Cada log incluye:
 - `vehicleId` → Identificador de vehículo

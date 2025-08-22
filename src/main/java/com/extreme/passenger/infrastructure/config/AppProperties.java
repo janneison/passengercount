@@ -2,12 +2,20 @@ package com.extreme.passenger.infrastructure.config;
 
 import java.util.List;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Component
+@Getter @Setter
+@ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-    public static List<String> excludedIds = List.of("COOCHOFAL250");
-
-    public static int passengerCountTolerance = 150; // tolerancia
-    public static int timeThresholdMinutes = 30; // minutos límite
-    public static String timezone = "UTC";
+    private List<String> excludedIds;
+    private int passengerCountTolerance;
+    private int timeThresholdMinutes;
+    private String timezone;
 
 }

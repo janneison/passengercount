@@ -50,7 +50,7 @@ Este documento describe **a detalle** el flujo de negocio y técnico del servici
   - El lock se **libera al commit/rollback** (fin de la transacción).
 - Implicaciones:
   - Podemos escalar instancias y recibir eventos concurrentes de **vehículos distintos** sin conflicto.
-  - Si llegan muchos eventos del **mismo vehículo** a la vez, **hacen cola** sobre el lock (observado ~1 evento/seg a modo de referencia en pruebas).
+  - Si llegan muchos eventos del **mismo vehículo** a la vez, **hacen cola** sobre el lock (observado ~1.7 evento/seg a modo de referencia en pruebas).
 
 ---
 

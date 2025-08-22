@@ -33,6 +33,17 @@ server:
     context-path: ${SERVER_CONTEXT_PATH:/api/v1}
 
 app:
+
   kafka:
     passenger-topic: ${PASSENGER_TOPIC:}
     consumer-enabled: ${KAFKA_CONSUMER_ENABLED:}
+  
+  excluded-ids: ${APP_EXCLUDED_IDS:COOCHOFAL250,EMBUSA99}
+  passenger-count-tolerance: ${APP_PASSENGER_COUNT_TOLERANCE:200}
+  time-threshold-minutes: ${APP_TIME_THRESHOLD_MINUTES:45}
+  timezone: ${APP_TIMEZONE:America/Bogota}
+
+  async:
+    core-pool-size: ${APP_ASYNC_CORE_POOL_SIZE:2}
+    max-pool-size: ${APP_ASYNC_MAX_POOL_SIZE:2}
+    queue-capacity: ${APP_ASYNC_QUEUE_CAPACITY:500}

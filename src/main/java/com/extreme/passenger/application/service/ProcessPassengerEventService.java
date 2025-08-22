@@ -29,9 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProcessPassengerEventService {
 
+    private final AppProperties props;
     private final PassengerEventRepository repository;
 
-    private ZoneId zone() { return ZoneId.of(AppProperties.timezone); }
+    private ZoneId zone() { return ZoneId.of(props.getTimezone()); }
 
     private Instant now() { return Instant.now(); }
 
@@ -131,11 +132,11 @@ public class ProcessPassengerEventService {
             }
 
             // 6) descarte por pico
-            int tol = AppProperties.passengerCountTolerance;
-            int minLimit = AppProperties.timeThresholdMinutes;
+            int tol = props.getPassengerCountTolerance();
+            int minLimit = props.getTimeThresholdMinutes();
             boolean spike = anyGte(net, tol);
             boolean inWindow = minutesDiff != null && minutesDiff < minLimit;
-            boolean excluded = AppProperties.excludedIds
+            boolean excluded = props.getExcludedIds()
                     .stream().map(s -> s.toUpperCase(Locale.ROOT))
                     .anyMatch(s -> s.equals(event.getIdVehicle().toUpperCase(Locale.ROOT)));
 
