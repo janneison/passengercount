@@ -19,6 +19,7 @@ import com.extreme.passenger.domain.port.PassengerEventRepository.PrevPoint;
 import com.extreme.passenger.domain.port.PassengerEventRepository.RepoAcc;
 import com.extreme.passenger.infrastructure.config.AppProperties;
 import com.extreme.passenger.presentation.dto.PassengerEventOut;
+import com.extreme.passenger.presentation.dto.Status;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class ProcessPassengerEventService {
 
         if (event == null) {
             return PassengerEventOut.builder()
-                    .status("ERROR")
+                    .status(Status.INVALID)
                     .message("Evento nulo")
                     .data(null)
                     .build();
@@ -55,7 +56,7 @@ public class ProcessPassengerEventService {
             if (!repository.vehicleExists(event.getIdVehicle())) {
                 log.warn("{} Vehículo no encontrado", logPrefix);
                 return PassengerEventOut.builder()
-                        .status("NOT_FOUND")
+                        .status(Status.NOT_FOUND)
                         .message("Vehículo no encontrado")
                         .data(event)
                         .build();
@@ -137,7 +138,7 @@ public class ProcessPassengerEventService {
             if (lastDateOpt.isPresent() && spike && inWindow && !excluded) {
                 repository.insertDiscarded(event, net, raw, null, null);
                 return PassengerEventOut.builder()
-                        .status("DISCARDED")
+                        .status(Status.DISCARDED)
                         .message("Evento descartado por pico")
                         .data(event)
                         .build();
@@ -168,7 +169,7 @@ public class ProcessPassengerEventService {
             repository.updateVehicleLastCount(event.getIdVehicle(), currentDate);
 
             return PassengerEventOut.builder()
-                    .status("OK")
+                    .status(Status.OK)
                     .message("Evento procesado exitosamente")
                     .data(event)
                     .build();
@@ -176,7 +177,7 @@ public class ProcessPassengerEventService {
         } catch (Exception e) {
             log.error("Error procesando evento", e);
             return PassengerEventOut.builder()
-                    .status("ERROR")
+                    .status(Status.ERROR)
                     .message("Error interno del servidor: " + e.getMessage())
                     .data(event)
                     .build();

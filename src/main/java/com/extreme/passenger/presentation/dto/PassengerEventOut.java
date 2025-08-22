@@ -10,7 +10,7 @@ import lombok.Data;
 public class PassengerEventOut {
 
     private PassengerEvent data;
-    private String status;
+    private Status status;
     private String message;
     
 }

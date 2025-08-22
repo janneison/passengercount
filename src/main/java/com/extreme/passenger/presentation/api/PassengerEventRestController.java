@@ -10,6 +10,7 @@ import com.extreme.passenger.application.service.ProcessPassengerEventService;
 import com.extreme.passenger.domain.model.PassengerEvent;
 import com.extreme.passenger.presentation.dto.PassengerEventIn;
 import com.extreme.passenger.presentation.dto.PassengerEventOut;
+import com.extreme.passenger.presentation.dto.Status;
 import com.extreme.passenger.presentation.mapper.PassengerEventMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class PassengerEventRestController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(PassengerEventOut.builder()
                 .data(null)
-                .status("ERROR")
+                .status(Status.ERROR)
                 .message("Failed to process event: " + e.getMessage())
                 .build()
             );
@@ -45,7 +46,7 @@ public class PassengerEventRestController {
             service.process(event);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(PassengerEventOut.builder()
                 .data(event)
-                .status("RECEIVED")
+                .status(Status.RECEIVED)
                 .message("Event is being processed asynchronously")
                 .build()
             );
@@ -53,7 +54,7 @@ public class PassengerEventRestController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(PassengerEventOut.builder()
                 .data(null)
-                .status("ERROR")
+                .status(Status.ERROR)
                 .message("Failed to process event: " + e.getMessage())
                 .build()
             );
