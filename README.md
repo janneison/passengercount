@@ -167,8 +167,8 @@ Cada log incluye:
 
 Ejemplo:
 ```
-2025-08-22 10:38:01 INFO  [vehicle=EMBUSA50 messageId=8f9d7a32]
-Evento insertado PassengerEvent(...)
+2025-08-22 10:38:01 INFO  [vehicle=EMBUSA50 messageId=174141590889400] Evento insertado PassengerEvent(...)
+
 ```
 
 Esto permite rastrear fácilmente qué logs corresponden a un mismo evento.
