@@ -49,9 +49,10 @@ public class ProcessPassengerEventService {
 
         String messageId = String.valueOf(System.nanoTime());
         String idVehicle = event.getIdVehicle();
+        Instant checkinTime = event.getCheckinTime();
 
-        if (idVehicle == null || idVehicle.isBlank()) {
-            log.warn("[eventId={}][vehicle=null] Evento inválido (falta idVehicle)", messageId);
+        if (idVehicle == null || idVehicle.isBlank()  || checkinTime == null) {
+            log.warn("[eventId={}][vehicle=null] Evento inválido (falta idVehicle) o date", messageId);
             return PassengerEventOut.builder()
                     .status(Status.INVALID)
                     .message("Evento inválido (falta idVehicle)")
@@ -177,7 +178,7 @@ public class ProcessPassengerEventService {
             }
 
             // 9) ajuste de fecha
-            Instant eventTs = event.getCheckinTime();
+            Instant eventTs = checkinTime;
             ZonedDateTime eventZ = ZonedDateTime.ofInstant(eventTs, zone());
             long days = Math.abs(Duration.between(eventZ, ZonedDateTime.ofInstant(now(), zone())).toDays());
             Instant currentDate = days > 1 ? now() : eventTs;

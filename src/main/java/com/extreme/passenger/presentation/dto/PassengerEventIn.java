@@ -60,7 +60,7 @@ public class PassengerEventIn {
 
     @JsonProperty("checkin_time")
     @JsonAlias({"date", "timestamp", "checkinTime", "datetime"})
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Instant checkinTime;
 
     @JsonProperty("latitude")

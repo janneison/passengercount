@@ -57,18 +57,28 @@ public class PassengerEventConsumer {
             return;
         }
 
+        if (in == null) {
+            ack.acknowledge();
+            return;
+        }
+
         // 3) Proceso de negocio: si falla (BD down, etc) NO ack → retry por el contenedor
         try {
             PassengerEventOut out = service.processSync(mapper.toDomain(in));
+
+            if (out == null) {
+                // recuperable: NO ack -> para que se reintente
+                log.error("Kafka {}: service devolvió null → NO ack (retry)", meta);
+                return;
+            }
+
             if (NON_RETRYABLE.contains(out.getStatus())) {
                 log.info("Kafka {}: procesado status='{}' → ack", meta, out.getStatus());
                 ack.acknowledge();
             } else {
-                    // Cualquier otro status lo tratamos como recuperable → NO ack
-                    log.warn("Kafka {}: status recuperable='{}' → NO ack (se reintentará)", meta, out.getStatus());
+                log.warn("Kafka {}: status recuperable='{}' → NO ack (se reintentará)", meta, out.getStatus());
             }
         } catch (Exception e) {
-            // Error recuperable (BD, timeouts, etc.) → NO ack
             log.error("Kafka {}: error procesando (recuperable) → NO ack (retry)", meta, e);
         }
     }
