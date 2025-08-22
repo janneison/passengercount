@@ -48,14 +48,25 @@ public class ProcessPassengerEventService {
         }
 
         String messageId = String.valueOf(System.nanoTime());
-        String logPrefix = "[vehicle=" + event.getIdVehicle() + "][eventId=" + messageId + "]";
+        String idVehicle = event.getIdVehicle();
+
+        if (idVehicle == null || idVehicle.isBlank()) {
+            log.warn("[eventId={}][vehicle=null] Evento inválido (falta idVehicle)", messageId);
+            return PassengerEventOut.builder()
+                    .status(Status.INVALID)
+                    .message("Evento inválido (falta idVehicle)")
+                    .data(event)
+                    .build();
+        }
+
+        String logPrefix = "[vehicle=" + idVehicle + "][eventId=" + messageId + "]";
 
         try {
+            
             log.info("{} Evento recibido: {}", logPrefix, event);
 
-            
             // 0) Verificar vehículo
-            if (!repository.vehicleExists(event.getIdVehicle())) {
+            if (!repository.vehicleExists(idVehicle)) {
                 log.warn("{} Vehículo no encontrado", logPrefix);
                 return PassengerEventOut.builder()
                 .status(Status.NOT_FOUND)
@@ -64,7 +75,7 @@ public class ProcessPassengerEventService {
                 .build();
             }
             
-            repository.lockVehicleRow(event.getIdVehicle());
+            repository.lockVehicleRow(idVehicle);
 
             // 1) Acumulados totales de esta lectura (raw)
             Accumulators raw = Accumulators.builder()
@@ -83,8 +94,8 @@ public class ProcessPassengerEventService {
             raw.setTotalBlock(raw.getDoor1Block() + raw.getDoor2Block() + raw.getDoor3Block());
 
             // 2) last_date y flag history
-            Optional<Instant> lastDateOpt = repository.getLastDate(event.getIdVehicle());
-            boolean hasHistory = repository.hasHistory(event.getIdVehicle());
+            Optional<Instant> lastDateOpt = repository.getLastDate(idVehicle);
+            boolean hasHistory = repository.hasHistory(idVehicle);
 
             // 3) prev accum si aplica
             Accumulators prev = Accumulators.builder()
@@ -96,7 +107,7 @@ public class ProcessPassengerEventService {
 
             if (lastDateOpt.isPresent() && hasHistory) {
                 Instant lastDate = lastDateOpt.get();
-                Optional<RepoAcc> ra = repository.getLastAccumulators(event.getIdVehicle(), lastDate);
+                Optional<RepoAcc> ra = repository.getLastAccumulators(idVehicle, lastDate);
                 if (ra.isPresent()) {
                     prevProgramId = ra.get().programId();
                     var a = ra.get().acc();
@@ -137,7 +148,7 @@ public class ProcessPassengerEventService {
             boolean inWindow = minutesDiff != null && minutesDiff < minLimit;
             boolean excluded = props.getExcludedIds()
                     .stream().map(s -> s.toUpperCase(Locale.ROOT))
-                    .anyMatch(s -> s.equals(event.getIdVehicle().toUpperCase(Locale.ROOT)));
+                    .anyMatch(s -> s.equals(idVehicle.toUpperCase(Locale.ROOT)));
 
             if (lastDateOpt.isPresent() && spike && inWindow && !excluded) {
                 repository.insertDiscarded(event, net, raw, null, null);
@@ -150,7 +161,7 @@ public class ProcessPassengerEventService {
             }
 
             // 7) viaje actual
-            Long programId = repository.getActiveProgramToday(event.getIdVehicle()).orElse(null);
+            Long programId = repository.getActiveProgramToday(idVehicle).orElse(null);
             log.info("{} Viaje actual: {}", logPrefix, programId);
 
             // 8) punto anterior
@@ -174,7 +185,7 @@ public class ProcessPassengerEventService {
             // 10) insert final + update vehiculos
             repository.insertPassengerEvent(event, programId, pointId, net, raw);
             log.info("{} Evento insertado {}", logPrefix, event);
-            repository.updateVehicleLastCount(event.getIdVehicle(), currentDate);
+            repository.updateVehicleLastCount(idVehicle, currentDate);
             log.info("{} Vehículo actualizado", logPrefix);
 
             return PassengerEventOut.builder()
