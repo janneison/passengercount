@@ -27,7 +27,7 @@ public class PassengerEventRestController {
         try {
             PassengerEvent event = mapper.toDomain(in);
             PassengerEventOut passengerEventOut = service.process(event).join();
-            return ResponseEntity.status(HttpStatus.OK).body(passengerEventOut);
+            return ResponseEntity.status(passengerEventOut.getStatus().getHttpStatus()).body(passengerEventOut);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(PassengerEventOut.builder()
